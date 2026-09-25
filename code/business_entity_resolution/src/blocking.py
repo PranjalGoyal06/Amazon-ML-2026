@@ -175,6 +175,9 @@ class MultiStrategyBlocker:
         total_pruned = 0
         for cntry, type_dict in self.indexes.items():
             for k_type, key_dict in type_dict.items():
+                # Do not prune high-precision keys
+                if k_type in ("exact", "num_postal"):
+                    continue
                 for k_val, posting in list(key_dict.items()):
                     if len(posting) > self.max_key_freq:
                         # Prune or truncate
@@ -197,6 +200,16 @@ class MultiStrategyBlocker:
             return set()
 
         candidates: Counter = Counter()
+        
+        # Weights for different key types to prioritize strong signals
+        key_weights = {
+            "exact": 100.0,
+            "num_postal": 50.0,
+            "prefix": 10.0,
+            "num_token": 10.0,
+            "token": 1.0,
+            "soundex": 1.0,
+        }
 
         norm_name = normalize_business_name(raw_name)
         norm_addr = normalize_address(raw_addr)
@@ -207,10 +220,12 @@ class MultiStrategyBlocker:
             k_map = cntry_idx.get(k_type)
             if not k_map:
                 continue
+            weight = key_weights.get(k_type, 1.0)
             for val in k_vals:
                 postings = k_map.get(val)
                 if postings:
-                    candidates.update(postings)
+                    for p in postings:
+                        candidates[p] += weight
 
         # Strategy B: Address keys
         addr_keys = self._extract_address_keys(raw_addr, cntry)
@@ -218,10 +233,12 @@ class MultiStrategyBlocker:
             k_map = cntry_idx.get(k_type)
             if not k_map:
                 continue
+            weight = key_weights.get(k_type, 1.0)
             for val in k_vals:
                 postings = k_map.get(val)
                 if postings:
-                    candidates.update(postings)
+                    for p in postings:
+                        candidates[p] += weight
 
         # Strategy C: Vector TF-IDF / Token Overlap
         if self.enable_vector_tfidf:
@@ -251,10 +268,11 @@ class MultiStrategyBlocker:
                 # Add top vector candidates
                 if vec_candidates:
                     for tid, score in vec_candidates.most_common(self.vector_top_k):
-                        candidates[tid] += 1
+                        # Vector scores can be high (e.g. 5.0 - 15.0), scale them reasonably
+                        candidates[tid] += score
 
         if self.max_candidates_per_entity and len(candidates) > self.max_candidates_per_entity:
-            # Deterministic truncation if exceeded, top N by match count
+            # Deterministic truncation if exceeded, top N by score
             candidates = set(c for c, _ in candidates.most_common(self.max_candidates_per_entity))
         else:
             candidates = set(candidates.keys())

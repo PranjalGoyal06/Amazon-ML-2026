@@ -7,7 +7,7 @@ to maximize the exact competition F_0.5 macro metric.
 import numpy as np
 import pandas as pd
 import lightgbm as lgb
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Set, Optional
 from tqdm import tqdm
 
 from src.evaluation import compute_macro_f05
@@ -26,9 +26,10 @@ class BaselineMatchingModel:
         )
         self.features = [
             "country_match",
-            "name_levenshtein", "name_token_sort", "name_jaccard", "name_overlap",
-            "addr_levenshtein", "addr_token_sort", "addr_jaccard",
-            "postal_match", "street_num_match"
+            "name_levenshtein", "name_token_sort", "name_jaccard", "name_overlap", "name_char_3gram",
+            "addr_levenshtein", "addr_token_sort", "addr_jaccard", "addr_char_3gram",
+            "postal_match", "street_num_match",
+            "candidate_rank", "score_gap_to_best", "embedding_cosine_sim"
         ]
         self.best_threshold = 0.5
 

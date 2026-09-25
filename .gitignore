@@ -225,3 +225,8 @@ dataset/splits/
 output/*.tsv
 output/*.csv
 .DS_Store
+
+# Ignored artifacts
+outputs/
+*.zip
+*.bak

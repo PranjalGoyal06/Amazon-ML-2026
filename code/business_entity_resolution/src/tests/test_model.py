@@ -4,9 +4,9 @@ from src.model import BaselineMatchingModel
 def test_model_training_and_sweep():
     # Dummy data
     df_features = pd.DataFrame([
-        {"source1_entity_id": "S1-1", "candidate_entity_id": "T-1", "country_match": 1.0, "name_levenshtein": 0.9, "name_token_sort": 0.9, "name_jaccard": 0.9, "name_overlap": 0.9, "addr_levenshtein": 0.9, "addr_token_sort": 0.9, "addr_jaccard": 0.9, "postal_match": 1.0, "street_num_match": 1.0},
-        {"source1_entity_id": "S1-1", "candidate_entity_id": "T-2", "country_match": 1.0, "name_levenshtein": 0.2, "name_token_sort": 0.2, "name_jaccard": 0.1, "name_overlap": 0.1, "addr_levenshtein": 0.1, "addr_token_sort": 0.1, "addr_jaccard": 0.1, "postal_match": 0.0, "street_num_match": 0.0},
-        {"source1_entity_id": "S1-2", "candidate_entity_id": "T-3", "country_match": 1.0, "name_levenshtein": 0.95, "name_token_sort": 0.95, "name_jaccard": 1.0, "name_overlap": 1.0, "addr_levenshtein": 0.8, "addr_token_sort": 0.8, "addr_jaccard": 0.8, "postal_match": 0.0, "street_num_match": 1.0}
+        {"source1_entity_id": "S1-1", "candidate_entity_id": "T-1", "country_match": 1.0, "name_levenshtein": 0.9, "name_token_sort": 0.9, "name_jaccard": 0.9, "name_overlap": 0.9, "name_char_3gram": 0.9, "addr_levenshtein": 0.9, "addr_token_sort": 0.9, "addr_jaccard": 0.9, "addr_char_3gram": 0.9, "postal_match": 1.0, "street_num_match": 1.0, "candidate_rank": 1.0, "score_gap_to_best": 0.0, "embedding_cosine_sim": 0.9},
+        {"source1_entity_id": "S1-1", "candidate_entity_id": "T-2", "country_match": 1.0, "name_levenshtein": 0.2, "name_token_sort": 0.2, "name_jaccard": 0.1, "name_overlap": 0.1, "name_char_3gram": 0.1, "addr_levenshtein": 0.1, "addr_token_sort": 0.1, "addr_jaccard": 0.1, "addr_char_3gram": 0.1, "postal_match": 0.0, "street_num_match": 0.0, "candidate_rank": 2.0, "score_gap_to_best": 1.0, "embedding_cosine_sim": 0.1},
+        {"source1_entity_id": "S1-2", "candidate_entity_id": "T-3", "country_match": 1.0, "name_levenshtein": 0.95, "name_token_sort": 0.95, "name_jaccard": 1.0, "name_overlap": 1.0, "name_char_3gram": 1.0, "addr_levenshtein": 0.8, "addr_token_sort": 0.8, "addr_jaccard": 0.8, "addr_char_3gram": 0.8, "postal_match": 0.0, "street_num_match": 1.0, "candidate_rank": 1.0, "score_gap_to_best": 0.0, "embedding_cosine_sim": 0.85}
     ])
     
     df_labels = pd.DataFrame([

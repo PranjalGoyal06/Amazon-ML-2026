@@ -1,3 +1,8 @@
+scikit-learn
+lightgbm
+tqdm
+sentence-transformers
+
 # Dependencies strictly required for eda.ipynb
 # ---------------------------------------------
 
