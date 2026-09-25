@@ -1,7 +1,11 @@
 import os
+import sys
 import time
 from pathlib import Path
 import pandas as pd
+
+# Add the parent directory of src to sys.path to allow running from anywhere
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from src.blocking import MultiStrategyBlocker
 from src.features import batch_compute_features
@@ -39,6 +43,17 @@ def main():
     
     s1_all = pd.read_csv(s1_path, sep="\t", usecols=["entity_id", "business_name", "business_address", "country"])
     s1_val = s1_all[s1_all["entity_id"].isin(val_gt["source1_entity_id"])].copy()
+
+    # To prevent OOM and speed up execution, filter target_df to only needed target entities + some noise
+    needed_targets = set()
+    for _, row in val_gt.iterrows():
+        m = str(row["matched_entity_ids"])
+        needed_targets.update([x.strip() for x in m.split(",") if x.strip()])
+    
+    # Filter target_df down to needed targets plus 10k random rows for noise
+    target_needed = target_df[target_df["entity_id"].isin(needed_targets)]
+    target_noise = target_df.sample(n=min(10000, len(target_df)), random_state=42)
+    target_df = pd.concat([target_needed, target_noise]).drop_duplicates(subset=["entity_id"])
 
     print("Pre-normalizing columns for fast feature computation...")
     s1_val["norm_name"] = s1_val["business_name"].apply(normalize_business_name)
