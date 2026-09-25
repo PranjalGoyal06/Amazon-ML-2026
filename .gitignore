@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Data and Outputs
+dataset/**/*.tsv
+dataset/**/*.csv
+dataset/splits/
+output/*.tsv
+output/*.csv
+.DS_Store
